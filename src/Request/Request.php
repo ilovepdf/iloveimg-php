@@ -1,6 +1,6 @@
 <?php
 
-namespace Iloveimg;
+namespace Iloveimg\Request;
 
 class Request
 {

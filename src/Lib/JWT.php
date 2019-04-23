@@ -1,6 +1,6 @@
 <?php
 
-namespace Iloveimg;
+namespace Iloveimg\Lib;
 
 /**
  * JSON Web Token implementation, based on this spec:

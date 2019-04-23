@@ -10,6 +10,8 @@ use Iloveimg\Exceptions\StartException;
 use Iloveimg\Exceptions\AuthException;
 use Iloveimg\IloveimgTool;
 use Iloveimg\Request\Body;
+use Iloveimg\Request\Request;
+use Iloveimg\Lib\JWT;
 
 /**
  * Class Iloveimg
@@ -188,6 +190,7 @@ class Iloveimg
                 throw new UploadException($response->body->error->message, $response->code, null, $response);
             }
             elseif ($endpoint == 'process') {
+                var_dump($response);
                 throw new ProcessException($response->body->error->message, $response->code, null, $response);
             }
             elseif (strpos($endpoint, 'download')===0) {

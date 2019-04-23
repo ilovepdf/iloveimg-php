@@ -2,7 +2,7 @@
 
 namespace Iloveimg\Request;
 
-use Iloveimg\Request as Request;
+use Iloveimg\Request\Request as Request;
 use Iloveimg\Exception as Exception;
 
 class Body

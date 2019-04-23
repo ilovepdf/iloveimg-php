@@ -6,7 +6,7 @@
  * http://www.iana.org/assignments/http-methods/http-methods.xhtml
  */
 
-namespace Iloveimg;
+namespace Iloveimg\Request;
 
 interface Method
 {
