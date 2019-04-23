@@ -5,12 +5,12 @@ require_once('../vendor/autoload.php');
 //require_once('../init.php');
 
 
-use Iloveimg\CompressimageTask;
+use Iloveimg\CompressImageTask;
 
 
 // you can call task class directly
 // to get your key pair, please visit https://developer.iloveimg.com/user/projects
-$myTask = new CompressimageTask('project_public_id','project_secret_key');
+$myTask = new CompressImageTask('project_public_id','project_secret_key');
 
 // file var keeps info about server file id, name...
 // it can be used latter to cancel file

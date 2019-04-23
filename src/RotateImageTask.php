@@ -8,7 +8,7 @@ namespace Iloveimg;
  *
  * @package Iloveimg
  */
-class RotateImageTask extends Task
+class RotateImageTask extends ImageTask
 {
 
     /**

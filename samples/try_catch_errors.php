@@ -5,7 +5,7 @@ require_once('../vendor/autoload.php');
 //require_once('../init.php');
 
 use Iloveimg\Iloveimg;
-use Iloveimg\CompressImageTask;
+use Iloveimg\CompressimageImageTask;
 
 
 try {
@@ -17,7 +17,7 @@ try {
     $myTask = $iloveimg->newTask('compress');
 
     // or you can call task class directly, this set the same tool as before
-    $myTask = new \Iloveimg\CompressImageTask('project_public_id','project_secret_key');
+    $myTask = new \Iloveimg\CompressimageImageTask('project_public_id','project_secret_key');
 
 
     // file var keeps info about server file id, name...

@@ -6,7 +6,7 @@ namespace Iloveimg;
  *
  * @package Iloveimg
  */
-class CompressimageTask extends Task
+class CompressImageTask extends ImageTask
 {
     /**
      * @var string

@@ -6,7 +6,7 @@ namespace Iloveimg;
  *
  * @package Iloveimg
  */
-class CropImageTask extends Task
+class CropImageTask extends ImageTask
 {
 
     /**

@@ -8,7 +8,7 @@ namespace Iloveimg;
  *
  * @package Iloveimg
  */
-class WatermarkImageTask extends Task
+class WatermarkImageTask extends ImageTask
 {
     /**
      * @var string

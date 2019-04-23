@@ -191,6 +191,7 @@ class Iloveimg
                 throw new ProcessException($response->body->error->message, $response->code, null, $response);
             }
             elseif (strpos($endpoint, 'download')===0) {
+                var_dump($response);
                 throw new DownloadException($response->body->error->message, $response->code, null, $response);
             }
             else{
@@ -296,7 +297,7 @@ class Iloveimg
     }
 
     /**
-     * @return Task
+     * @return ImageTask
      */
     public function getStatus($server, $taskId)
     {

@@ -11,7 +11,7 @@ use Iloveimg\Request\Body;
  *
  * @package Iloveimg
  */
-class Task extends Iloveimg
+class ImageTask extends Iloveimg
 {
     // @var string The Iloveimg API Task ID.
     public $task = null;
@@ -21,8 +21,7 @@ class Task extends Iloveimg
     public $packaged_filename;
     public $output_filename;
     public $ignore_errors = true;
-    public $try_pdf_repair = true;
-    public $meta = [];
+    public $try_repair = true;
 
     /**
      * @var string
@@ -155,7 +154,7 @@ class Task extends Iloveimg
     }
 
     /**
-     * @return Task
+     * @return ImageTask
      */
     public function delete()
     {
@@ -285,7 +284,7 @@ class Task extends Iloveimg
     }
 
     /**
-     * @return Task
+     * @return ImageTask
      * @throws Exceptions\AuthException
      * @throws Exceptions\ProcessException
      * @throws Exceptions\UploadException
@@ -321,7 +320,7 @@ class Task extends Iloveimg
 
     /**
      * @param string $filename Set filename for downloaded zip file
-     * @return Task
+     * @return ImageTask
      */
     public function setPackagedFilename($filename)
     {
@@ -331,7 +330,7 @@ class Task extends Iloveimg
 
     /**
      * @param string $filename Set filename for individual file/s
-     * @return Task
+     * @return ImageTask
      */
     public function setOutputFilename($filename)
     {
@@ -341,7 +340,7 @@ class Task extends Iloveimg
 
     /**
      * @param $file File
-     * @return Task
+     * @return ImageTask
      * @throws Exceptions\AuthException
      * @throws Exceptions\DownloadException
      * @throws Exceptions\ProcessException
@@ -361,7 +360,7 @@ class Task extends Iloveimg
      * @param mixed $value
      * @param array $allowed
      *
-     * @return Task
+     * @return ImageTask
      */
     public function checkValues($value, $allowedValues){
         if(!in_array($value, $allowedValues)){
@@ -370,12 +369,12 @@ class Task extends Iloveimg
     }
 
     /**
-     * @param boolean $try_pdf_repair
-     * @return Task
+     * @param boolean $try_repair
+     * @return ImageTask
      */
-    public function setTryPdfRepair($try_pdf_repair)
+    public function setTryRepair($try_repair)
     {
-        $this->try_pdf_repair = $try_pdf_repair;
+        $this->try_repair = $try_repair;
 
         return $this;
     }
@@ -397,7 +396,7 @@ class Task extends Iloveimg
      * Will be deprecated on v2.0
      *
      * @param boolean $value If true, and multiple archives are processed it will ignore files with errors and continue process for all others
-     * @return Task
+     * @return ImageTask
      */
     public function ignoreErrors($value)
     {
@@ -408,7 +407,7 @@ class Task extends Iloveimg
 
     /**
      * @param boolean $value
-     * @return Task
+     * @return ImageTask
      */
     public function setFileEncryption($value, $encryptKey=null)
     {
@@ -417,20 +416,6 @@ class Task extends Iloveimg
         }
 
         parent::setFileEncryption($value, $encryptKey);
-
-        return $this;
-    }
-
-    /**
-     * set meta values as http://www.adobe.com/content/dam/Adobe/en/devnet/acrobat/pdfs/pdf_reference_1-7.pdf (page 844)
-     *
-     * @param $key
-     * @param $value
-     * @return Task
-     */
-    public function setMeta($key, $value)
-    {
-        $this->meta[$key] = $value;
 
         return $this;
     }

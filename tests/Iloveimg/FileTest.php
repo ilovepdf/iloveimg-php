@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Iloveimg;
+namespace Tests\iloveimg;
 
 use Iloveimg\File;
 use PHPUnit\Framework\TestCase;
