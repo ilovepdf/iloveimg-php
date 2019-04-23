@@ -1,0 +1,30 @@
+{
+    "name": "iloveimg/iloveimg-php",
+    "description": "iLoveIMG Php Api",
+    "type": "library",
+    "homepage": "https://iloveimg.com/",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "iloveimg",
+            "email": "info@iloveimg.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Iloveimg\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "require": {
+        "php": ">=7.1",
+        "ext-curl": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^7.1"
+    }
+}
