@@ -26,21 +26,6 @@ class Element
     public $image = null;
 
     /**
-     * @var string
-     */
-    public $pages = 'all';
-
-    /**
-     * @var string
-     */
-    public $vertical_position = 'Middle';
-
-    /**
-     * @var string
-     */
-    public $horizontal_position = 'Center';
-
-    /**
      * @var integer
      */
     public $vertical_adjustment = 0;
@@ -142,6 +127,8 @@ class Element
      * @var
      */
     public $gravity = 'Center';
+    private $gravityValues = ['North', 'NorthEast', 'NorthWest', 'Center', 'CenterEast', 'CenterWest', 'East', 'West', 'South', 'SouthEast', 'SouthWest'];
+
 
     /**
      * @var int
@@ -265,7 +252,6 @@ class Element
     }
 
 
-
     /**
      * @param string $vertical_position
      */
@@ -300,9 +286,45 @@ class Element
     /**
      * @param int $horizontal_position_adjustment
      */
-    public function setHorizontalPositionAdjustment($horizontal_position_adjustment)
+    public function setHorizontalAdjustmentPercent($horizontal_adjustment_percent)
     {
-        $this->horizontal_position_adjustment = $horizontal_position_adjustment;
+        $this->horizontal_adjustment_percent = $horizontal_adjustment_percent;
         return $this;
     }
+
+    /**
+     * @param $gravity
+     * @return $this
+     */
+    public function setGravity($gravity)
+    {
+        $this->checkValues($gravity, $this->gravityValues);
+
+        $this->gravity = $gravity;
+        return $this;
+    }
+
+    /**
+     * @param int $width_percent
+     * @return $this
+     */
+    public function setWidthPercent(int $width_percent)
+    {
+        $this->width_percent = $width_percent;
+        return $this;
+    }
+
+    /**
+     * @param mixed $value
+     * @param array $allowed
+     *
+     * @return ImageTask
+     */
+    public function checkValues($value, $allowedValues)
+    {
+        if (!in_array($value, $allowedValues)) {
+            throw new \InvalidArgumentException('Invalid ' . $this->tool . ' value "' . $value . '". Must be one of: ' . implode(',', $allowedValues));
+        }
+    }
+
 }

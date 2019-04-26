@@ -5,6 +5,7 @@ require_once('../vendor/autoload.php');
 //require_once('../init.php');
 
 use Iloveimg\WatermarkImageTask;
+use Iloveimg\Element;
 
 
 // you can call task class directly
@@ -15,44 +16,40 @@ $myTask = new WatermarkImageTask('project_public_id','project_secret_key');
 // it can be used latter to cancel file
 $file = $myTask->addFile('/path/to/file/document.jpg');
 
+$watermarkElement = new Element();
 // set mode to text
-$myTask->setMode("text");
+$watermarkElement->setType("text");
 
 // set the text
-$myTask->setText("watermark text");
+$watermarkElement->setText("watermark text");
 
-// set pages to apply the watermark
-$myTask->setPages("1-5,7");
 
 // set vertical position
-$myTask->setVerticalPosition("top");
-
-// set horizontal position
-$myTask->setHorizontalPosition("right");
+$watermarkElement->setGravity("NorthWest");
 
 // adjust vertical position
-$myTask->setVerticalPositionAdjustment("100");
+$watermarkElement->setWidthPercent(20);
 
 // adjust horizontal position
-$myTask->setHorizontalPositionAdjustment("100");
+$watermarkElement->setHorizontalPositionAdjustment("100");
 
 // set mode to text
-$myTask->setFontFamily("Arial");
+$watermarkElement->setFontFamily("Arial");
 
 // set mode to text
-$myTask->setFontStyle("Italic");
+$watermarkElement->setFontStyle("Italic");
 
 // set the font size
-$myTask->setFontSize("12");
+$watermarkElement->setFontSize("12");
 
 // set color to red
-$myTask->setFontColor("#ff0000");
+$watermarkElement->setFontColor("#ff0000");
 
 // set transparency
-$myTask->setTransparency("50");
+$watermarkElement->setTransparency("50");
 
-// set the layer
-$myTask->setLayer("below");
+
+$myTask->addElement($watermarkElement);
 
 // and set name for output file.
 // the task will set the correct file extension for you.

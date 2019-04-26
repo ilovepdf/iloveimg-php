@@ -8,17 +8,13 @@ use Iloveimg\WatermarkImageTask;
 
 // you can call task class directly
 // to get your key pair, please visit https://developer.iloveimg.com/user/projects
-$myTask = new WatermarkImageTask('project_public_id','project_secret_key');
+$myTask = new WatermarkImageTask('project_public_id', 'project_secret_key');
 
 // file var keeps info about server file id, name...
 // it can be used latter to cancel file
 $file = $myTask->addFile('/path/to/file/document.jpg');
 
-// set mode to text
-$myTask->setMode("text");
-
-// set the text
-$myTask->setText("watermark text");
+$myTask->addElement(['type' => 'text', 'text' => 'hello']);
 
 // process files
 $myTask->execute();

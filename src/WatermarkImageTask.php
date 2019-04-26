@@ -45,8 +45,7 @@ class WatermarkImageTask extends ImageTask
      */
     public function addElement($element)
     {
-
-        if (is_a($element, 'Element')) {
+        if (get_class($element) == 'Iloveimg\Element') {
             $this->elements[] = $element;
         } elseif (is_array($element)) {
             $this->elements[] = new Element($element);
