@@ -121,6 +121,11 @@ class Element
     /**
      * @var
      */
+    public $color_shadow;
+
+    /**
+     * @var
+     */
     public $font_size = 14;
 
     /**
@@ -238,6 +243,15 @@ class Element
     public function setFontColor($font_color)
     {
         $this->font_color = $font_color;
+        return $this;
+    }
+
+    /**
+     * @param string $font_color
+     */
+    public function setColorShadow($color_shadow)
+    {
+        $this->color_shadow = $color_shadow;
         return $this;
     }
 

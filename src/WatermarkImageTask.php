@@ -16,7 +16,6 @@ class WatermarkImageTask extends ImageTask
      */
     public $elements;
 
-
     /**
      * WatermarkTask constructor.
      * @param null|string $publicKey
