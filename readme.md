@@ -1,10 +1,10 @@
 iLoveIMG Api - Php Library
 --------------------------
 
-[![Build Status](https://travis-ci.org/iloveimg/iloveimg-php.svg?branch=master)](https://travis-ci.org/iloveimg/iloveimg-php)
-[![Latest Stable Version](https://poser.pugx.org/iloveimg/iloveimg-php/version)](https://packagist.org/packages/iloveimg/iloveimg-php)
-[![Total Downloads](https://poser.pugx.org/iloveimg/iloveimg-php/downloads.svg)](https://packagist.org/packages/iloveimg/iloveimg-php)
-[![License](https://poser.pugx.org/iloveimg/iloveimg-php/license)](https://packagist.org/packages/iloveimg/iloveimg-php)
+[![Build Status](https://travis-ci.org/ilovepdf/iloveimg-php.svg?branch=master)](https://travis-ci.org/ilovepdf/iloveimg-php)
+[![Latest Stable Version](https://poser.pugx.org/ilovepdf/iloveimg-php/version)](https://packagist.org/packages/ilovepdf/iloveimg-php)
+[![Total Downloads](https://poser.pugx.org/ilovepdf/iloveimg-php/downloads.svg)](https://packagist.org/packages/ilovepdf/iloveimg-php)
+[![License](https://poser.pugx.org/ilovepdf/iloveimg-php/license)](https://packagist.org/packages/ilovepdf/iloveimg-php)
 
 A library in php for [iLoveIMG Api](https://developer.iloveimg.com)
 
@@ -35,7 +35,7 @@ require_once('vendor/autoload.php');
 
 ### Manual Installation
 
-If you do not wish to use Composer, you can download the [latest release](https://github.com/iloveimg/iloveimg-php/releases). Then, to use the library, include the `init.php` file.
+If you do not wish to use Composer, you can download the [latest release](https://github.com/ilovepdf/iloveimg-php/releases). Then, to use the library, include the `init.php` file.
 
 ```php
 require_once('/path/to/iloveimg-php/init.php');
