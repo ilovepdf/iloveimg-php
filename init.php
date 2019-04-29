@@ -1,11 +1,11 @@
 <?php
 
 //Helpers
-require_once __DIR__ . '/src/JWT.php';
+require_once __DIR__ . '/src/lib/JWT.php';
 require_once __DIR__ . '/src/File.php';
-require_once __DIR__ . '/src/Method.php';
-require_once __DIR__ . '/src/Response.php';
-require_once __DIR__ . '/src/Request.php';
+require_once __DIR__ . '/src/Request/Method.php';
+require_once __DIR__ . '/src/Request/Response.php';
+require_once __DIR__ . '/src/Request/Request.php';
 require_once __DIR__ . '/src/Request/Body.php';
 
 //Exceptions
@@ -19,20 +19,14 @@ require_once __DIR__ . '/src/Exceptions/PathException.php';
 
 //Iloveimg
 require_once __DIR__ . '/src/Iloveimg.php';
-require_once __DIR__ . '/src/Task.php';
+require_once __DIR__ . '/src/ImageTask.php';
 
 //Specific processes
-require_once __DIR__ . '/src/CompressTask.php';
-require_once __DIR__ . '/src/ImagepdfTask.php';
-require_once __DIR__ . '/src/MergeTask.php';
-require_once __DIR__ . '/src/OfficepdfTask.php';
-require_once __DIR__ . '/src/PagenumberTask.php';
-require_once __DIR__ . '/src/PdfaTask.php';
-require_once __DIR__ . '/src/PdfjpgTask.php';
-require_once __DIR__ . '/src/ProtectTask.php';
-require_once __DIR__ . '/src/RepairTask.php';
-require_once __DIR__ . '/src/RotateTask.php';
-require_once __DIR__ . '/src/SplitTask.php';
-require_once __DIR__ . '/src/UnlockTask.php';
-require_once __DIR__ . '/src/WatermarkTask.php';
+require_once __DIR__ . '/src/CompressImageTask.php';
+require_once __DIR__ . '/src/WatermarkImageTask.php';
+require_once __DIR__ . '/src/RepairImageTask.php';
+require_once __DIR__ . '/src/ResizeImageTask.php';
+require_once __DIR__ . '/src/RotateImageTask.php';
+require_once __DIR__ . '/src/ConvertImageTask.php';
+require_once __DIR__ . '/src/CropImageTask.php';
 
