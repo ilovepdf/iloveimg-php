@@ -89,7 +89,7 @@ class Element
     /**
      * @var string
      */
-    public $font_family;
+    public $font_family = 'Arial';
 
     private $fontFamilyValues = ['Arial', 'Arial Unicode MS', 'Verdana', 'Courier', 'Times New Roman', 'Comic Sans MS', 'WenQuanYi Zen Hei', 'Lohit Marathi'];
 

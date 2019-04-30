@@ -37,20 +37,25 @@ class WatermarkImageTask extends ImageTask
         return $this;
     }
 
+
     /**
      * adds a watermark element
      *
-     * @param $element
-     * @return $this
+     * @param null $element
+     * @return \Iloveimg\Element|null
      */
-    public function addElement($element)
+    public function addElement($element = null)
     {
-        if (get_class($element) == 'Iloveimg\Element') {
-            $this->elements[] = $element;
-        } elseif (is_array($element)) {
-            $this->elements[] = new Element($element);
+        if (is_array($element)  || $element == null) {
+            $element = new Element($element);
         }
-        return $this;
+
+        if (get_class($element) !== 'Iloveimg\Element') {
+            throw new \InvalidArgumentException();
+        }
+
+        $this->elements[] = $element;
+        return $element;
     }
 
 }

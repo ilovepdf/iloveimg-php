@@ -13,7 +13,18 @@ class ConvertImageTask extends ImageTask
      */
     public $to = 'jpg';
 
-    private $toValues = ["jpg", "png", "gif"];
+    private $toValues = ["jpg", "png", "gif", "gif_animation"];
+
+
+    /**
+     * @var int
+     */
+    public $gif_time = 50;
+
+    /**
+     * @var bool
+     */
+    public $gif_loop = true;
 
     /**
      * ConvertimageTask constructor.
@@ -32,10 +43,30 @@ class ConvertImageTask extends ImageTask
      * values: ["jpg"|"png"|"gif"]
      * default: "jpg"
      */
-    public function setTo($to)
+    public function setTo(string $to)
     {
         $this->checkValues($to, $this->toValues);
         $this->to = $to;
+        return $this;
+    }
+
+    /**
+     * @param int $gif_time
+     * @return $this
+     */
+    public function setGifTime(int $gif_time)
+    {
+        $this->gif_time = $gif_time;
+        return $this;
+    }
+
+    /**
+     * @param bool $gif_loop
+     * @return $this
+     */
+    public function setGifLoop(bool $gif_loop)
+    {
+        $this->gif_loop = $gif_loop;
         return $this;
     }
 }
