@@ -16,9 +16,7 @@ $myTask = new WatermarkImageTask('project_public_id','project_secret_key');
 // it can be used latter to cancel file
 $file = $myTask->addFile('/path/to/file/document.jpg');
 
-$watermarkElement = new Element();
-// set mode to text
-$watermarkElement->setType("text");
+$watermarkElement = $myTask->addElement();
 
 // set the text
 $watermarkElement->setText("watermark text");
@@ -48,8 +46,6 @@ $watermarkElement->setFontColor("#ff0000");
 // set transparency
 $watermarkElement->setTransparency("50");
 
-
-$myTask->addElement($watermarkElement);
 
 // and set name for output file.
 // the task will set the correct file extension for you.

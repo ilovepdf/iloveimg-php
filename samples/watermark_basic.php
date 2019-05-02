@@ -14,7 +14,8 @@ $myTask = new WatermarkImageTask('project_public_id', 'project_secret_key');
 // it can be used latter to cancel file
 $file = $myTask->addFile('/path/to/file/document.jpg');
 
-$myTask->addElement(['type' => 'text', 'text' => 'hello']);
+$element = $myTask->addElement();
+$element->setText('watermark text');
 
 // process files
 $myTask->execute();
