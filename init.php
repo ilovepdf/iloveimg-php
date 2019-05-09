@@ -1,7 +1,7 @@
 <?php
 
 //Helpers
-require_once __DIR__ . '/src/lib/JWT.php';
+require_once __DIR__ . '/src/Lib/JWT.php';
 require_once __DIR__ . '/src/File.php';
 require_once __DIR__ . '/src/Request/Method.php';
 require_once __DIR__ . '/src/Request/Response.php';
