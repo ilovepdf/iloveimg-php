@@ -34,7 +34,7 @@ class Iloveimg
     // @var string|null The version of the Iloveimg API to use for requests.
     public static $apiVersion = 'v1';
 
-    const VERSION = 'php.1.1.12';
+    const VERSION = 'php.1.0.2';
 
     public $token = null;
 
