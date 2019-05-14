@@ -26,12 +26,12 @@ class ResizeImageTask extends ImageTask
     /**
      * @var int
      */
-    public $pixels_width = 0;
+    public $pixels_width = null;
 
     /**
      * @var int
      */
-    public $pixels_height = 0;
+    public $pixels_height = null;
 
     /**
      * @var int
