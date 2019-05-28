@@ -34,10 +34,10 @@ class CropImageTask extends ImageTask
      * @param string $publicKey
      * @param string $secretKey
      */
-    function __construct($publicKey, $secretKey)
+    function __construct($publicKey, $secretKey, $makeStart = true)
     {
         $this->tool = 'cropimage';
-        parent::__construct($publicKey, $secretKey, true);
+        parent::__construct($publicKey, $secretKey, $makeStart);
     }
 
     /**

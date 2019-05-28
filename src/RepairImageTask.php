@@ -14,9 +14,9 @@ class RepairImageTask extends ImageTask
      * @param string $publicKey
      * @param string $secretKey
      */
-    function __construct($publicKey, $secretKey)
+    function __construct($publicKey, $secretKey, $makeStart = true)
     {
         $this->tool = 'repairimage';
-        parent::__construct($publicKey, $secretKey, true);
+        parent::__construct($publicKey, $secretKey, $makeStart);
     }
 }

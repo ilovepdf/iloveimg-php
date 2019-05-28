@@ -134,7 +134,7 @@ class Iloveimg
         $token['jti'] = $this->getPublicKey();
 
         // Set encryptKey
-        if ($this->getFileEncryption()){
+        if ($this->getFileEncryption()) {
             $token['file_encryption_key'] = $this->getEncrytKey();
         }
 
@@ -164,7 +164,7 @@ class Iloveimg
      * @throws ProcessException
      * @throws UploadException
      */
-    public function sendRequest($method, $endpoint, $body=null, $start=false)
+    public function sendRequest($method, $endpoint, $body = null, $start = false)
     {
         $to_server = self::$startServer;
         if (!$start && !is_null($this->getWorkerServer())) {
@@ -188,18 +188,13 @@ class Iloveimg
             }
             if ($endpoint == 'upload') {
                 throw new UploadException($response->body->error->message, $response->code, null, $response);
-            }
-            elseif ($endpoint == 'process') {
-                var_dump($response);
+            } elseif ($endpoint == 'process') {
                 throw new ProcessException($response->body->error->message, $response->code, null, $response);
-            }
-            elseif (strpos($endpoint, 'download')===0) {
-                var_dump($response);
+            } elseif (strpos($endpoint, 'download') === 0) {
                 throw new DownloadException($response->body->error->message, $response->code, null, $response);
-            }
-            else{
+            } else {
                 if ($response->code == 400) {
-                    if(strpos($endpoint, 'task')!=-1){
+                    if (strpos($endpoint, 'task') != -1) {
                         throw new TaskException('Invalid task id');
                     }
                     throw new \Exception('Bad Request');
@@ -217,21 +212,23 @@ class Iloveimg
      *
      * @throws \Exception
      */
-    public function newTask($tool='')
+    public function newTask($tool = '', $makeStart = true)
     {
         $classname = '\\Iloveimg\\' . ucwords(strtolower($tool)) . 'ImageTask';
         if (!class_exists($classname)) {
             throw new \InvalidArgumentException();
         }
-        return new $classname($this->getPublicKey(), $this->getSecretKey());
+        return new $classname($this->getPublicKey(), $this->getSecretKey(), $makeStart);
     }
 
-    public static function setStartServer($server){
+    public static function setStartServer($server)
+    {
         self::$startServer = $server;
     }
 
 
-    public static function getStartServer(){
+    public static function getStartServer()
+    {
         return self::$startServer;
     }
 
@@ -252,17 +249,15 @@ class Iloveimg
     }
 
 
-
     /**
      * @param boolean $value
      */
-    public function setFileEncryption($value, $encryptKey=null)
+    public function setFileEncryption($value, $encryptKey = null)
     {
         $this->encrypted = $value;
-        if($this->encrypted){
+        if ($this->encrypted) {
             $this->setEncryptKey($encryptKey);
-        }
-        else{
+        } else {
             $this->encryptKey = null;
         }
     }
@@ -287,9 +282,9 @@ class Iloveimg
     /**
      * @param mixed $encrytKey
      */
-    public function setEncryptKey($encryptKey=null)
+    public function setEncryptKey($encryptKey = null)
     {
-        if($encryptKey==null){
+        if ($encryptKey == null) {
             $encryptKey = IloveimgTool::rand_sha1(32);
         }
         $len = strlen($encryptKey);
@@ -306,7 +301,7 @@ class Iloveimg
     {
         $workerServer = $this->getWorkerServer();
         $this->setWorkerServer($server);
-        $response = $this->sendRequest('get', 'task/'.$taskId);
+        $response = $this->sendRequest('get', 'task/' . $taskId);
         $this->setWorkerServer($workerServer);
 
         return $response->body;
@@ -315,19 +310,20 @@ class Iloveimg
     /**
      * @param $verify
      */
-    public function verifySsl($verify){
+    public function verifySsl($verify)
+    {
         Request::verifyPeer($verify);
         Request::verifyHost($verify);
     }
 
-    private function getUpdatedInfo(){
+    private function getUpdatedInfo()
+    {
         $data = array('v' => self::VERSION);
         $body = Body::Form($data);
         $response = self::sendRequest('get', 'info', $body);
         $this->info = $response->body;
         return $this->info;
     }
-
 
 
     /**
