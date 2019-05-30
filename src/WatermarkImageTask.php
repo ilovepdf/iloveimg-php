@@ -16,6 +16,8 @@ class WatermarkImageTask extends ImageTask
      */
     public $elements;
 
+    public $watermakFiles = [];
+
     /**
      * WatermarkTask constructor.
      *
@@ -56,8 +58,16 @@ class WatermarkImageTask extends ImageTask
             throw new \InvalidArgumentException();
         }
 
+        if($element->type == 'image'){
+            foreach($this->files as $key=>$file){
+                if($file->server_filename == $element->server_filename){
+                    $this->watermakFiles[] = $this->files[$key];
+                    unset($this->files[$key]);
+                }
+            }
+        }
+
         $this->elements[] = $element;
         return $element;
     }
-
 }
