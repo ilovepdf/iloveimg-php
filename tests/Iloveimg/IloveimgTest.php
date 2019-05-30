@@ -60,6 +60,7 @@ class IloveimgTest extends TestCase
 
     /**
      * @test
+     * @expectedException \Exception
      */
     public function testEmptyTaskShouldThrowException()
     {
