@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\iloveimg;
+namespace Tests\Iloveimg;
 
 use Iloveimg\Iloveimg;
 use PHPUnit\Framework\TestCase;
@@ -60,6 +60,7 @@ class IloveimgTest extends TestCase
 
     /**
      * @test
+     * @expectedException \Exception
      */
     public function testEmptyTaskShouldThrowException()
     {

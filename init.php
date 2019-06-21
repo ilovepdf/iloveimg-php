@@ -7,7 +7,7 @@ require_once __DIR__ . '/src/Request/Method.php';
 require_once __DIR__ . '/src/Request/Response.php';
 require_once __DIR__ . '/src/Request/Request.php';
 require_once __DIR__ . '/src/Request/Body.php';
-
+require_once __DIR__ . '/src/Element.php';
 //Exceptions
 require_once __DIR__ . '/src/Exceptions/ExtendedException.php';
 require_once __DIR__ . '/src/Exceptions/DownloadException.php';

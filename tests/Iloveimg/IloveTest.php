@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\iloveimg;
+namespace Tests\Iloveimg;
 
 use Iloveimg\CompressTask;
 use Iloveimg\Iloveimg;
