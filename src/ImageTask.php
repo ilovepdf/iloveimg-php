@@ -179,6 +179,10 @@ class ImageTask extends Iloveimg
      */
     public function uploadFile($task, $filepath)
     {
+        if(!file_exists($filepath)){
+            throw new \InvalidArgumentException('File '.$filepath.' does not exists');
+        }
+
         $data = array('task' => $task, 'v' => self::VERSION);
         $files = array('file' => $filepath);
         $body = Request\Body::multipart($data, $files);

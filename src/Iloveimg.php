@@ -34,7 +34,7 @@ class Iloveimg
     // @var string|null The version of the Iloveimg API to use for requests.
     public static $apiVersion = 'v1';
 
-    const VERSION = 'php.1.0.2';
+    const VERSION = 'php.1.1.16';
 
     public $token = null;
 
@@ -187,6 +187,9 @@ class Iloveimg
                 throw new AuthException($response->body->name, $response->code, null, $response);
             }
             if ($endpoint == 'upload') {
+                if(is_string($response->body)){
+                    throw new UploadException("Upload error", $response->code, null, $response);
+                }
                 throw new UploadException($response->body->error->message, $response->code, null, $response);
             } elseif ($endpoint == 'process') {
                 throw new ProcessException($response->body->error->message, $response->code, null, $response);
