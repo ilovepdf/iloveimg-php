@@ -23,7 +23,7 @@ PHP 7.1 and later.
 You can install the library via [Composer](http://getcomposer.org/). Run the following command:
 
 ```bash
-composer require iloveimg/iloveimg-php
+composer require ilovepdf/iloveimg-php
 ```
 
 To use the library, use Composer's [autoload](https://getcomposer.org/doc/00-intro.md#autoloading):
