@@ -350,7 +350,7 @@ class Element
     public function checkValues($value, $allowedValues)
     {
         if (!in_array($value, $allowedValues)) {
-            throw new \InvalidArgumentException('Invalid ' . $this->tool . ' value "' . $value . '". Must be one of: ' . implode(',', $allowedValues));
+            throw new \InvalidArgumentException('Invalid value "' . $value . '". Must be one of: ' . implode(',', $allowedValues));
         }
     }
 
