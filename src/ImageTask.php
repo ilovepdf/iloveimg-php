@@ -5,6 +5,11 @@ namespace Iloveimg;
 use Iloveimg\Exceptions\StartException;
 use Iloveimg\Exceptions\PathException;
 use Iloveimg\Request\Body;
+use Iloveimg\Exceptions\AuthException;
+use Iloveimg\Exceptions\DownloadException;
+use Iloveimg\Exceptions\ProcessException;
+use Iloveimg\Exceptions\UploadException;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Class Iloveimg
@@ -276,30 +281,65 @@ class ImageTask extends Iloveimg
         return;
     }
 
+
     /**
-     * @param string $task
+     * @param string|null $task
      * @param string $path
      *
-     * @throws Exceptions\AuthException
-     * @throws Exceptions\ProcessException
-     * @throws Exceptions\UploadException
+     * @throws AuthException
+     * @throws ProcessException
+     * @throws UploadException
+     * @throws DownloadException
      */
-    private function downloadFile($task)
+    private function downloadFile($task): void
+    {
+        $response = $this->downloadRequestData($task);
+
+        try {
+            $this->outputFile = $response->getBody()->getContents();
+        } catch (\Exception $e) {
+            throw new DownloadException('No file content for download');
+        }
+    }
+
+    /**
+     * @param string $task
+     * @return ResponseInterface
+     */
+    public function downloadStream(string $task): ResponseInterface
+    {
+        $response = $this->downloadRequestData($task);
+
+        return $response;
+    }
+
+
+    /**
+     * @param string $task
+     * @return ResponseInterface
+     * @throws AuthException
+     * @throws ProcessException
+     * @throws UploadException
+     */
+    private function downloadRequestData(string $task): ResponseInterface
     {
         $data = array('v' => self::VERSION);
-        $body = Request\Body::Form($data);
+        $body = ['form_params' => $data];
+        /** @psalm-suppress PossiblyNullOperand */
         $response = parent::sendRequest('get', 'download/' . $task, $body);
+        $responseHeaders = $response->getHeaders();
 
-        if (preg_match("/filename\*\=utf-8\'\'([\W\w]+)/", $response->headers['Content-Disposition'], $matchesUtf)) {
+        if (preg_match("/filename\*\=utf-8\'\'([\W\w]+)/", $responseHeaders['Content-Disposition'][0], $matchesUtf)) {
             $filename = urldecode(str_replace('"', '', $matchesUtf[1]));
         } else {
-            preg_match('/ .*filename=\"([\W\w]+)\"/', $response->headers['Content-Disposition'], $matches);
+            preg_match('/ .*filename=\"([\W\w]+)\"/', $responseHeaders['Content-Disposition'][0], $matches);
             $filename = str_replace('"', '', $matches[1]);
         }
 
-        $this->outputFile = $response->raw_body;
         $this->outputFileName = $filename;
         $this->outputFileType = pathinfo($this->outputFileName, PATHINFO_EXTENSION);
+
+        return $response;
     }
 
     /**
