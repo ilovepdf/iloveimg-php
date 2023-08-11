@@ -2,6 +2,8 @@
 
 namespace Iloveimg\Exceptions;
 
-class StartException  extends \Exception {
+use Iloveimg\Exceptions\ExtendedException;
+
+class StartException  extends ExtendedException {
 
 }

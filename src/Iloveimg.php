@@ -184,17 +184,17 @@ class Iloveimg
 
         if ($response->code != '200' && $response->code != '201') {
             if ($response->code == 401) {
-                throw new AuthException($response->body->name, $response->code, null, $response);
+                throw new AuthException($response->body->name, $response->code, $response);
             }
             if ($endpoint == 'upload') {
                 if(is_string($response->body)){
-                    throw new UploadException("Upload error", $response->code, null, $response);
+                    throw new UploadException("Upload error", $response->code, $response);
                 }
-                throw new UploadException($response->body->error->message, $response->code, null, $response);
+                throw new UploadException($response->body->error->message, $response->code,  $response);
             } elseif ($endpoint == 'process') {
-                throw new ProcessException($response->body->error->message, $response->code, null, $response);
+                throw new ProcessException($response->body->error->message, $response->code,  $response);
             } elseif (strpos($endpoint, 'download') === 0) {
-                throw new DownloadException($response->body->error->message, $response->code, null, $response);
+                throw new DownloadException($response->body->error->message, $response->code,  $response);
             } else {
                 if ($response->code == 400) {
                     if (strpos($endpoint, 'task') != -1) {
