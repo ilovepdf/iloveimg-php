@@ -4,7 +4,12 @@ namespace Iloveimg;
 
 use Iloveimg\Exceptions\StartException;
 use Iloveimg\Exceptions\PathException;
-use Iloveimg\Request\Body;
+use Iloveimg\Exceptions\AuthException;
+use Iloveimg\Exceptions\DownloadException;
+use Iloveimg\Exceptions\ProcessException;
+use Iloveimg\Exceptions\UploadException;
+use Iloveimg\File;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Class Iloveimg
@@ -46,9 +51,27 @@ class ImageTask extends Iloveimg
     public $result;
 
     //downloaded file
+
+    /**
+     * @var string
+     */
     public $outputFile;
+
+    /**
+     * @var string
+     */
     public $outputFileName;
+
+    /**
+     * @var string
+     */
     public $outputFileType;
+
+
+    /**
+     * @var int|null
+     */
+    public $remainingFiles;
 
 
     /**
@@ -67,31 +90,40 @@ class ImageTask extends Iloveimg
         }
     }
 
-    public function start()
+    public function start(): void
     {
-        $data = array('v' => self::VERSION);
-        $body = Body::Form($data);
+        if ($this->tool == null) {
+            throw new StartException('Tool must be set');
+        }
+        $data = ['v' => self::VERSION];
+        $body = ['form_params' => $data];
         $response = parent::sendRequest('get', 'start/' . $this->tool, $body);
-        if (empty($response->body->server)) {
+        try {
+            $responseBody = json_decode($response->getBody());
+        } catch (\Exception $e) {
+            throw new StartException('Invalid response');
+        }
+        if (empty($responseBody->server)) {
             throw new StartException('no server assigned on start');
         };
-        $this->setWorkerServer('https://' . $response->body->server);
-        $this->setTask($response->body->task);
+        $this->_setRemainingFiles($responseBody->remaining_files ?? null);
+        $this->setWorkerServer('https://' . $responseBody->server);
+        $this->setTask($responseBody->task);
     }
 
-    public function next($nextTool): ImageTask
+    public function next(string $nextTool): self
     {
         $data = [
             'v' => self::VERSION,
             'task' => $this->getTaskId(),
             'tool' => $nextTool
         ];
-        $body = Body::Form($data);
+        $body = ['form_params' => $data];
 
         try {
             $response = parent::sendRequest('post', 'task/next', $body);
-
-            if (empty($response->body->task)) {
+            $responseBody = json_decode($response->getBody());
+            if (empty($responseBody->task)) {
                 throw new StartException('No task assigned on chained start');
             };
         } catch (\Exception $e) {
@@ -100,10 +132,11 @@ class ImageTask extends Iloveimg
 
         $next = $this->newTask($nextTool);
         $next->setWorkerServer($this->getWorkerServer());
-        $next->setTask($response->body->task);
+
+        $next->setTask($responseBody->task);
 
         //add files chained
-        foreach ($response->body->files as $serverFilename => $fileName) {
+        foreach ($responseBody->files as $serverFilename => $fileName) {
             $next->files[] = new File($serverFilename, $fileName);
         }
 
@@ -177,18 +210,32 @@ class ImageTask extends Iloveimg
      * @throws Exceptions\ProcessException
      * @throws UploadException
      */
-    public function uploadFile($task, $filepath)
+    public function uploadFile(string $task, string $filepath)
     {
-        if(!file_exists($filepath)){
-            throw new \InvalidArgumentException('File '.$filepath.' does not exists');
+        if (!file_exists($filepath)) {
+            throw new \InvalidArgumentException('File ' . $filepath . ' does not exists');
         }
 
-        $data = array('task' => $task, 'v' => self::VERSION);
-        $files = array('file' => $filepath);
-        $body = Request\Body::multipart($data, $files);
+        $body = [
+            'multipart' => [
+                [
+                    'Content-type' => 'multipart/form-data',
+                    'name' => 'file',
+                    'contents' => fopen($filepath, 'r'),
+                    'filename' => basename($filepath)
+                ],
+                ['name' => 'task', 'contents' => $task],
+                ['name' => 'v', 'contents' => self::VERSION]
+            ],
+        ];
 
         $response = $this->sendRequest('post', 'upload', $body);
-        return new File($response->body->server_filename, basename($filepath));
+        try {
+            $responseBody = json_decode($response->getBody());
+        } catch (\Exception $e) {
+            throw new UploadException('Upload response error');
+        }
+        return new File($responseBody->server_filename, basename($filepath));
     }
 
     /**
@@ -210,12 +257,25 @@ class ImageTask extends Iloveimg
      * @throws Exceptions\ProcessException
      * @throws UploadException
      */
-    public function uploadUrl($task, $url)
+    public function uploadUrl($task, $url, $bearerToken = null)
     {
-        $data = array('task' => $task, 'cloud_file' => $url, 'v' => self::VERSION);
-        $body = Request\Body::Form($data);
+        //$data = ['task' => $task, 'cloud_file' => $url, 'v' => self::VERSION];
+        //$body = ['form_data' => $data];
+        $body = [
+            'multipart' => [
+                ['name' => 'task', 'contents' => $task],
+                ['name' => 'v', 'contents' => self::VERSION],
+                ['name' => 'cloud_file', 'contents' => $url]
+            ],
+        ];
+
+        if ($bearerToken) {
+            $body['multipart'][] = ['name' => 'cloud_token', 'contents' => $bearerToken];
+        }
+
         $response = parent::sendRequest('post', 'upload', $body);
-        return new File($response->body->server_filename, basename($url));
+        $responseBody = json_decode($response->getBody());
+        return new File($responseBody->server_filename, basename($url));
     }
 
     /**
@@ -276,31 +336,67 @@ class ImageTask extends Iloveimg
         return;
     }
 
+
     /**
-     * @param string $task
+     * @param string|null $task
      * @param string $path
      *
-     * @throws Exceptions\AuthException
-     * @throws Exceptions\ProcessException
-     * @throws Exceptions\UploadException
+     * @throws AuthException
+     * @throws ProcessException
+     * @throws UploadException
+     * @throws DownloadException
      */
-    private function downloadFile($task)
+    private function downloadFile($task): void
+    {
+        $response = $this->downloadRequestData($task);
+
+        try {
+            $this->outputFile = $response->getBody()->getContents();
+        } catch (\Exception $e) {
+            throw new DownloadException('No file content for download');
+        }
+    }
+
+    /**
+     * @param string $task
+     * @return ResponseInterface
+     */
+    public function downloadStream(): ResponseInterface
+    {
+        $response = $this->downloadRequestData($this->task);
+
+        return $response;
+    }
+
+
+    /**
+     * @param string $task
+     * @return ResponseInterface
+     * @throws AuthException
+     * @throws ProcessException
+     * @throws UploadException
+     */
+    private function downloadRequestData(string $task): ResponseInterface
     {
         $data = array('v' => self::VERSION);
-        $body = Request\Body::Form($data);
+        $body = ['form_params' => $data];
+        /** @psalm-suppress PossiblyNullOperand */
         $response = parent::sendRequest('get', 'download/' . $task, $body);
-        $contentDispoition = $response->headers['Content-Disposition'] ?? $response->headers['content-disposition'];
+        $responseHeaders = $response->getHeaders();
 
-        if (preg_match("/filename\*\=utf-8\'\'([\W\w]+)/", $contentDispoition, $matchesUtf)) {
+        $contentDisposition = isset($responseHeaders['Content-Disposition']) ? $responseHeaders['Content-Disposition'] : $responseHeaders['content-disposition'];
+
+        if (preg_match("/filename\*\=utf-8\'\'([\W\w]+)/", $contentDisposition[0], $matchesUtf)) {
             $filename = urldecode(str_replace('"', '', $matchesUtf[1]));
         } else {
-            preg_match('/ .*filename=\"([\W\w]+)\"/', $contentDispoition, $matches);
+            preg_match('/ .*filename=\"([\W\w]+)\"/', $contentDisposition[0], $matches);
             $filename = str_replace('"', '', $matches[1]);
         }
 
-        $this->outputFile = $response->raw_body;
         $this->outputFileName = $filename;
         $this->outputFileType = pathinfo($this->outputFileName, PATHINFO_EXTENSION);
+
+        return $response;
     }
 
     /**
@@ -328,31 +424,45 @@ class ImageTask extends Iloveimg
      */
     public function execute()
     {
-        if ($this->task === null) {
-            throw new \Exception('Current task not exists');
-        }
+        $this->validateTaskStarted();
 
         $data = array_merge(
-            $this->getPublicVars($this),
-            array('task' => $this->task, 'files' => $this->files, 'v' => self::VERSION));
+            $this->__toArray(),
+            ['task' => $this->task, 'files' => $this->files, 'v' => self::VERSION]
+        );
 
         //clean unwanted vars to be sent
         unset($data['timeoutLarge']);
         unset($data['timeout']);
         unset($data['timeDelay']);
 
-        $body = Request\Body::multipart($data);
+        $body = ['form_params' => $data];
 
-        $response = parent::sendRequest('post', 'process', urldecode(http_build_query($body)));
+        //$response = parent::sendRequest('post', 'process', http_build_query($body, null, '&', PHP_QUERY_RFC3986));
+        $response = parent::sendRequest('post', 'process', $body);
 
-        $this->result = $response->body;
+        $this->result = json_decode($response->getBody());
 
         return $this;
     }
 
-    public function getPublicVars()
+    public function __toArray()
     {
-        return call_user_func('get_object_vars', $this);
+        $props = [];
+        $reflection = new \ReflectionClass($this);
+        $properties = array_filter(
+            $reflection->getProperties(\ReflectionProperty::IS_PUBLIC),
+            function ($property) {
+                return !$property->isStatic();
+            }
+        );
+        foreach ($properties as $property) {
+            $name = $property->name;
+            $props[$name] = $this->$name;
+        }
+
+        return $props;
+        // return call_user_func('get_object_vars', $this);
     }
 
 
@@ -385,11 +495,14 @@ class ImageTask extends Iloveimg
      * @throws Exceptions\UploadException
      * @throws \Exception
      */
-    public function deleteFile($file)
+    public function deleteFile(File $file)
     {
+        $this->validateTaskStarted();
+
         if (($key = array_search($file, $this->files)) !== false) {
-            $body = Request\Body::multipart(['task' => $this->getTaskId(), 'server_filename' => $file->server_filename, 'v' => self::VERSION]);
-            $this->sendRequest('post', 'upload/delete', $body);
+            $body = ['form_params' => ['task' => $this->getTaskId(), 'server_filename' => $file->server_filename, 'v' => self::VERSION]];
+            /** @psalm-suppress PossiblyNullOperand */
+            $this->sendRequest('delete', 'upload/' . $this->getTaskId() . '/' . $file->server_filename, $body);
             unset($this->files[$key]);
         }
         return $this;
@@ -488,7 +601,7 @@ class ImageTask extends Iloveimg
      *
      * @throws \Exception
      */
-    public function listTasks($tool = null, $status = null, $customInt = null, $page = null)
+    public function listTasks(?string $tool = null, ?string $status = null, ?int $customInt = null, ?int $page = null): array
     {
 
         $this->checkValues($status, $this->statusValues);
@@ -502,11 +615,10 @@ class ImageTask extends Iloveimg
             'secret_key' => $this->getSecretKey()
         ];
 
-        $body = Request\Body::multipart($data);
+        $body = ['form_params' => $data];
 
         $response = parent::sendRequest('post', 'task', $body, true);
-
-        $this->result = $response->body;
+        $this->result = json_decode($response->getBody());
 
         return $this->result;
     }
@@ -519,5 +631,26 @@ class ImageTask extends Iloveimg
     {
         $this->webhook = $webhook;
         return $this;
+    }
+
+
+    /**
+     * @return void
+     * @throws \Exception
+     */
+    private function validateTaskStarted(): void
+    {
+        if ($this->task === null) {
+            throw new \Exception('Current task does not exists. You must start your task');
+        }
+    }
+
+    /**
+     * @param $remainingFiles
+     * @return void
+     */
+    private function _setRemainingFiles($remainingFiles): void
+    {
+        $this->remainingFiles = $remainingFiles;
     }
 }

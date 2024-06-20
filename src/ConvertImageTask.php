@@ -11,7 +11,7 @@ class ConvertImageTask extends ImageTask
     /**
      * @var string
      */
-    public $to = 'jpg';
+    public $convert_to = 'jpg';
 
     private $toValues = ["jpg", "png", "gif", "gif_animation"];
 
@@ -45,11 +45,21 @@ class ConvertImageTask extends ImageTask
      * values: ["jpg"|"png"|"gif"]
      * default: "jpg"
      */
-    public function setTo(string $to)
+    public function setConvertTo(string $convertTo)
     {
-        $this->checkValues($to, $this->toValues);
-        $this->to = $to;
+        $this->checkValues($convertTo, $this->toValues);
+        $this->convert_to = $convertTo;
         return $this;
+    }
+
+    /**
+     * Alias for setConvertTo
+     * @param string $convertTo
+     * @return $this
+     */
+    public function setTo(string $convertTo)
+    {
+        return $this->setConvertTo($convertTo);
     }
 
     /**

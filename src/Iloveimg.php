@@ -6,12 +6,12 @@ use Iloveimg\Exceptions\DownloadException;
 use Iloveimg\Exceptions\ProcessException;
 use Iloveimg\Exceptions\TaskException;
 use Iloveimg\Exceptions\UploadException;
-use Iloveimg\Exceptions\StartException;
 use Iloveimg\Exceptions\AuthException;
-use Iloveimg\IloveimgTool;
-use Iloveimg\Request\Body;
-use Iloveimg\Request\Request;
-use Iloveimg\Lib\JWT;
+use Iloveimg\Exceptions\StartException;
+use Iloveimg\Http\Client;
+use Iloveimg\Http\ClientException;
+use Firebase\JWT\JWT;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Class Iloveimg
@@ -34,7 +34,7 @@ class Iloveimg
     // @var string|null The version of the Iloveimg API to use for requests.
     public static $apiVersion = 'v1';
 
-    const VERSION = 'php.1.1.16';
+    const VERSION = 'php.1.1.17';
 
     public $token = null;
 
@@ -53,8 +53,13 @@ class Iloveimg
 
     public $info = null;
 
-
-    public function __construct($publicKey = null, $secretKey = null)
+    /**
+     * Iloveimg constructor.
+     * @param string $publicKey
+     * @param string $secretKey
+     * @param bool $makeStart
+     */
+    public function __construct(?string $publicKey = null, ?string $secretKey = null)
     {
         if ($publicKey && $secretKey)
             $this->setApiKeys($publicKey, $secretKey);
@@ -156,55 +161,94 @@ class Iloveimg
     /**
      * @param string $method
      * @param string $endpoint
-     * @param string $body
+     * @param array $params
+     * @param bool $start
      *
-     * @return mixed response from server
+     * @return ResponseInterface response from server
      *
-     * @throws AuthException
+     * @throws \Iloveimg\Exceptions\AuthException
      * @throws ProcessException
      * @throws UploadException
      */
-    public function sendRequest($method, $endpoint, $body = null, $start = false)
+    public function sendRequest(string $method, string $endpoint, array $params = [], bool $start = false): ResponseInterface
     {
-        $to_server = self::$startServer;
+        $to_server = self::getStartServer();
         if (!$start && !is_null($this->getWorkerServer())) {
             $to_server = $this->workerServer;
         }
 
-        if ($endpoint == 'process' || $endpoint == 'upload' || strpos($endpoint, 'download/') === 0) {
-            Request::timeout($this->timeoutLarge);
-        } else {
-            Request::timeout($this->timeout);
+        /** @psalm-suppress PossiblyNullOperand */
+        $timeout = ($endpoint == 'process' || $endpoint == 'upload' || strpos($endpoint, 'download/') === 0) ? $this->timeoutLarge : $this->timeout;
+        $requestConfig = [
+            'connect_timeout' => $timeout,
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->getJWT(),
+                'Accept' => 'application/json'
+            ],
+        ];
+
+        $requestParams = $requestConfig;
+        if ($params) {
+            $requestParams = array_merge($requestConfig, $params);
         }
 
-        $response = Request::$method($to_server . '/v1/' . $endpoint, array(
-            'Accept' => 'application/json',
-            'Authorization' => 'Bearer ' . $this->getJWT()
-        ), $body);
+        $client = new Client($params);
+        $error = null;
 
-        if ($response->code != '200' && $response->code != '201') {
-            if ($response->code == 401) {
-                throw new AuthException($response->body->name, $response->code, null, $response);
+        try {
+            /** @psalm-suppress PossiblyNullOperand */
+            $response = $client->request($method, $to_server . '/v1/' . $endpoint, $requestParams);
+        } catch (ClientException $e) {
+            $response = $e->getResponse();
+            $error = $e;
+        }
+        $responseCode = $response->getStatusCode();
+
+        if ($responseCode != 200 && $responseCode != 201) {
+            $responseBody = json_decode((string)$response->getBody());
+            if ($responseCode == 401) {
+                throw new AuthException($responseBody->name, $responseBody, $responseCode);
             }
             if ($endpoint == 'upload') {
-                if(is_string($response->body)){
-                    throw new UploadException("Upload error", $response->code, null, $response);
+                if (is_string($responseBody)) {
+                    throw new UploadException("Upload error", $responseBody, $responseCode);
                 }
-                throw new UploadException($response->body->error->message, $response->code, null, $response);
+                throw new UploadException($responseBody->error->message, $responseBody, $responseCode);
             } elseif ($endpoint == 'process') {
-                throw new ProcessException($response->body->error->message, $response->code, null, $response);
+                throw new ProcessException($responseBody->error->message, $responseBody, $responseCode);
             } elseif (strpos($endpoint, 'download') === 0) {
-                throw new DownloadException($response->body->error->message, $response->code, null, $response);
+                throw new DownloadException($responseBody->error->message, $responseBody, $responseCode);
+            } elseif (strpos($endpoint, 'start') === 0) {
+                if (isset($responseBody->error) && isset($responseBody->error->type)) {
+                    throw new StartException($responseBody->error->message, $responseBody, $responseCode);
+                }
+                throw new \Exception('Bad Request');
             } else {
-                if ($response->code == 400) {
-                    if (strpos($endpoint, 'task') != -1) {
+                if ($response->getStatusCode() == 429) {
+                    throw new \Exception('Too Many Requests');
+                }
+                if ($response->getStatusCode() == 400) {
+                    //common process exception
+                    if (strpos($endpoint, 'task') !== false) {
                         throw new TaskException('Invalid task id');
+                    }
+                    //signature exception
+                    if(strpos($endpoint, 'signature') !== false){
+                        throw new ProcessException($responseBody->error->type, $responseBody, $response->getStatusCode());
+                    }
+
+                    if (isset($responseBody->error) && isset($responseBody->error->type)) {
+                        throw new \Exception($responseBody->error->message);
                     }
                     throw new \Exception('Bad Request');
                 }
-                throw new \Exception($response->body->error->message);
+                if (isset($responseBody->error) && isset($responseBody->error->message)) {
+                    throw new \Exception($responseBody->error->message);
+                }
+                throw new \Exception('Bad Request');
             }
         }
+
         return $response;
     }
 
@@ -313,27 +357,26 @@ class Iloveimg
     /**
      * @param $verify
      */
-    public function verifySsl($verify)
+    public function verifySsl(bool $verify): void
     {
-        Request::verifyPeer($verify);
-        Request::verifyHost($verify);
+        Client::setVerify($verify);
     }
-
 
 
     /**
      * @param $follow
      */
-    public function followLocation($follow){
-        Request::followLocation($follow);
+    public function followLocation(bool $follow): void
+    {
+        Client::setAllowRedirects($follow);
     }
 
-    private function getUpdatedInfo()
+    private function getUpdatedInfo(): object
     {
         $data = array('v' => self::VERSION);
-        $body = Body::Form($data);
+        $body = ['form_params' => $data];
         $response = self::sendRequest('get', 'info', $body);
-        $this->info = $response->body;
+        $this->info = json_decode($response->getBody());
         return $this->info;
     }
 
