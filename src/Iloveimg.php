@@ -203,6 +203,7 @@ class Iloveimg
             $error = $e;
         }
         $responseCode = $response->getStatusCode();
+
         if ($responseCode != 200 && $responseCode != 201) {
             $responseBody = json_decode((string)$response->getBody());
             if ($responseCode == 401) {
