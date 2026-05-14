@@ -30,10 +30,10 @@ class UpscaleImageTask extends ImageTask
 
     /**
      * @param $multiplier integer
-     *
+
      * values: [2|4]
      */
-    public function setMultiplier($multiplier)
+    public function setMultiplier($multiplier): static
     {
         $this->checkValues($multiplier, $this->multiplierValues);
 

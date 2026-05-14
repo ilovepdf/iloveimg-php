@@ -11,7 +11,7 @@ namespace Iloveimg;
 
 class IloveimgTool
 {
-    public static function rand_sha1($length) {
+    public static function rand_sha1(int $length): string {
         $max = ceil($length / 40);
         $random = '';
         for ($i = 0; $i < $max; $i ++) {
@@ -20,7 +20,7 @@ class IloveimgTool
         return substr($random, 0, $length);
     }
 
-    public static function rand_md5($length) {
+    public static function rand_md5($length): string {
         $max = ceil($length / 32);
         $random = '';
         for ($i = 0; $i < $max; $i ++) {

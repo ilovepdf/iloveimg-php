@@ -30,11 +30,11 @@ class CompressImageTask extends ImageTask
 
     /**
      * @param $level string
-     *
+
      * values: ["extreme"|"recommended"|"low"]
      * default: "recommended"
      */
-    public function setCompressionLevel($level)
+    public function setCompressionLevel($level): static
     {
         $this->checkValues($level, $this->compressionLevelValues);
 

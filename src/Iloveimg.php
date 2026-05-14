@@ -86,7 +86,7 @@ class Iloveimg
      *
      * @param string $apiKey
      */
-    public function setApiKeys($publicKey, $secretKey)
+    public function setApiKeys(string $publicKey, string $secretKey): void
     {
         $this->publicKey = $publicKey;
         $this->secretKey = $secretKey;
@@ -104,7 +104,7 @@ class Iloveimg
     /**
      * @param string $apiVersion The API version to use for requests.
      */
-    public static function setApiVersion($apiVersion)
+    public static function setApiVersion($apiVersion): void
     {
         self::$apiVersion = $apiVersion;
     }
@@ -268,7 +268,7 @@ class Iloveimg
         return new $classname($this->getPublicKey(), $this->getSecretKey(), $makeStart);
     }
 
-    public static function setStartServer($server)
+    public static function setStartServer($server): void
     {
         self::$startServer = $server;
     }
@@ -290,7 +290,7 @@ class Iloveimg
     /**
      * @param null $workerServer
      */
-    public function setWorkerServer($workerServer)
+    public function setWorkerServer($workerServer): void
     {
         $this->workerServer = $workerServer;
     }
@@ -298,6 +298,8 @@ class Iloveimg
 
     /**
      * @param boolean $value
+     *
+     * @return void
      */
     public function setFileEncryption($value, $encryptKey = null)
     {
@@ -328,6 +330,8 @@ class Iloveimg
 
     /**
      * @param mixed $encrytKey
+     *
+     * @return void
      */
     public function setEncryptKey($encryptKey = null)
     {
@@ -344,7 +348,7 @@ class Iloveimg
     /**
      * @return ImageTask
      */
-    public function getStatus($server, $taskId)
+    public function getStatus(string $server, $taskId)
     {
         $workerServer = $this->getWorkerServer();
         $this->setWorkerServer($server);

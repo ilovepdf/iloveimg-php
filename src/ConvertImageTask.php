@@ -41,11 +41,11 @@ class ConvertImageTask extends ImageTask
 
     /**
      * @param $level string
-     *
+
      * values: ["jpg"|"png"|"gif"]
      * default: "jpg"
      */
-    public function setConvertTo(string $convertTo)
+    public function setConvertTo(string $convertTo): static
     {
         $this->checkValues($convertTo, $this->toValues);
         $this->convert_to = $convertTo;

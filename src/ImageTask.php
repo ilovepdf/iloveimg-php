@@ -143,7 +143,7 @@ class ImageTask extends Iloveimg
         return $next;
     }
 
-    public function setTask($task)
+    public function setTask($task): void
     {
         $this->task = $task;
     }
@@ -158,7 +158,10 @@ class ImageTask extends Iloveimg
         return $this->files;
     }
 
-    public function getFilesArray()
+    /**
+     * @psalm-return list{0?: mixed,...}
+     */
+    public function getFilesArray(): array
     {
         $filesArray = [];
         foreach ($this->files as $file) {
@@ -282,7 +285,7 @@ class ImageTask extends Iloveimg
      * @param null|string $path
      * @param null|string $file
      */
-    public function download($path = null)
+    public function download($path = null): void
     {
         if ($path != null && !is_dir($path)) {
             if (pathinfo($path, PATHINFO_EXTENSION) == '') {
@@ -305,7 +308,7 @@ class ImageTask extends Iloveimg
      * @param null|string $path
      * @param null|string $file
      */
-    public function blob()
+    public function blob(): string
     {
         $this->downloadFile($this->task);
         return $this->outputFile;
@@ -315,7 +318,7 @@ class ImageTask extends Iloveimg
      * @param null|string $path
      * @param null|string $file
      */
-    public function toBrowser()
+    public function toBrowser(): void
     {
         $this->downloadFile($this->task);
 
@@ -402,7 +405,7 @@ class ImageTask extends Iloveimg
     /**
      * @param $value
      */
-    public function sendEncryptedFiles($value)
+    public function sendEncryptedFiles($value): void
     {
         self::$encrypted = $value;
     }
@@ -511,10 +514,8 @@ class ImageTask extends Iloveimg
     /**
      * @param mixed $value
      * @param array $allowed
-     *
-     * @return ImageTask
      */
-    public function checkValues($value, $allowedValues)
+    public function checkValues($value, array $allowedValues): void
     {
         if (!in_array($value, $allowedValues)) {
             throw new \InvalidArgumentException('Invalid ' . $this->tool . ' value "' . $value . '". Must be one of: ' . implode(',', $allowedValues));
@@ -535,7 +536,7 @@ class ImageTask extends Iloveimg
     /**
      * @param boolean $ignore_errors
      */
-    public function setIgnoreErrors($ignore_errors)
+    public function setIgnoreErrors($ignore_errors): static
     {
         $this->ignore_errors = $ignore_errors;
 

@@ -170,9 +170,12 @@ class Element
 
     /**
      * @param string $mode
+     *
      * @return Element
+     *
+     * @psalm-param 'image' $type
      */
-    public function setType($type)
+    public function setType(string $type)
     {
         $this->type = $type;
         return $this;
@@ -207,7 +210,7 @@ class Element
     /**
      * @param int $rotation
      */
-    public function setRotation($rotation)
+    public function setRotation($rotation): static
     {
         $this->rotation = $rotation;
         return $this;
@@ -216,7 +219,7 @@ class Element
     /**
      * @param string $font_family
      */
-    public function setFontFamily($font_family)
+    public function setFontFamily($font_family): static
     {
         $this->checkValues($font_family, $this->fontFamilyValues);
 
@@ -227,7 +230,7 @@ class Element
     /**
      * @param string $font_style
      */
-    public function setFontStyle($font_style)
+    public function setFontStyle($font_style): static
     {
         $this->font_style = $font_style;
         return $this;
@@ -236,7 +239,7 @@ class Element
     /**
      * @param string $font_weight
      */
-    public function setFontWeight($font_weight)
+    public function setFontWeight($font_weight): static
     {
         $this->font_weight = $font_weight;
         return $this;
@@ -245,7 +248,7 @@ class Element
     /**
      * @param int $font_size
      */
-    public function setFontSize($font_size)
+    public function setFontSize($font_size): static
     {
         $this->font_size = $font_size;
         return $this;
@@ -254,7 +257,7 @@ class Element
     /**
      * @param string $font_color
      */
-    public function setFontColor($font_color)
+    public function setFontColor($font_color): static
     {
         $this->font_color = $font_color;
         return $this;
@@ -263,7 +266,7 @@ class Element
     /**
      * @param string $font_color
      */
-    public function setColorShadow($color_shadow)
+    public function setColorShadow($color_shadow): static
     {
         $this->color_shadow = $color_shadow;
         return $this;
@@ -272,7 +275,7 @@ class Element
     /**
      * @param int $transparency
      */
-    public function setTransparency($transparency)
+    public function setTransparency($transparency): static
     {
         $this->transparency = $transparency;
         return $this;
@@ -282,7 +285,7 @@ class Element
     /**
      * @param string $vertical_position
      */
-    public function setVerticalPosition($vertical_position)
+    public function setVerticalPosition($vertical_position): static
     {
         $this->checkValues($vertical_position, $this->verticalPositionValues);
 
@@ -293,7 +296,7 @@ class Element
     /**
      * @param string $horizontal_position
      */
-    public function setHorizontalPosition($horizontal_position)
+    public function setHorizontalPosition($horizontal_position): static
     {
         $this->checkValues($horizontal_position, $this->horizontalPositionValues);
 
@@ -304,7 +307,7 @@ class Element
     /**
      * @param int $vertical_position_adjustment
      */
-    public function setVerticalPositionAdjustment($vertical_position_adjustment)
+    public function setVerticalPositionAdjustment($vertical_position_adjustment): static
     {
         $this->vertical_position_adjustment = $vertical_position_adjustment;
         return $this;
@@ -344,10 +347,8 @@ class Element
     /**
      * @param mixed $value
      * @param array $allowed
-     *
-     * @return ImageTask
      */
-    public function checkValues($value, $allowedValues)
+    public function checkValues($value, $allowedValues): void
     {
         if (!in_array($value, $allowedValues)) {
             throw new \InvalidArgumentException('Invalid value "' . $value . '". Must be one of: ' . implode(',', $allowedValues));
